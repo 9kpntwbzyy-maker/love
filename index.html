@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Никита ❤️ Эльвира</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    overflow: hidden;
+  }
+
+  /* Плавающие сердечки на фоне */
+  .hearts {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .heart {
+    position: absolute;
+    bottom: -50px;
+    font-size: 20px;
+    opacity: 0.6;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp {
+    to {
+      transform: translateY(-110vh) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .title {
+    font-size: 22px;
+    font-weight: 300;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+    color: #ff9ec4;
+  }
+
+  .names {
+    font-size: 18px;
+    color: #a8b2d1;
+    margin-bottom: 30px;
+  }
+
+  .big-heart {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  .counter {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 30px;
+  }
+
+  .unit {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 158, 196, 0.3);
+    border-radius: 16px;
+    padding: 18px 10px;
+    backdrop-filter: blur(10px);
+  }
+
+  .unit .number {
+    font-size: 32px;
+    font-weight: 700;
+    color: #ff9ec4;
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .unit .label {
+    font-size: 12px;
+    color: #a8b2d1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+    display: block;
+  }
+
+  .footer-text {
+    font-size: 15px;
+    color: #a8b2d1;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  @media (max-width: 360px) {
+    .unit .number { font-size: 26px; }
+    .big-heart { font-size: 52px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hearts" id="hearts"></div>
+
+<div class="container">
+  <div class="title">МЫ ВМЕСТЕ УЖЕ</div>
+  <div class="names" id="names">Никита ❤️ Эльвира</div>
+
+  <div class="big-heart">❤️</div>
+
+  <div class="counter">
+    <div class="unit">
+      <span class="number" id="days">0</span>
+      <span class="label">дней</span>
+    </div>
+    <div class="unit">
+      <span class="number" id="hours">0</span>
+      <span class="label">часов</span>
+    </div>
+    <div class="unit">
+      <span class="number" id="minutes">0</span>
+      <span class="label">минут</span>
+    </div>
+    <div class="unit">
+      <span class="number" id="seconds">0</span>
+      <span class="label">секунд</span>
+    </div>
+  </div>
+
+  <div class="footer-text" id="footerText">
+    Каждая секунда с тобой — бесценна
+  </div>
+</div>
+
+<script>
+  /* ====== НАСТРОЙКИ ====== */
+
+  // 20 апреля 2026 года, 06:00
+  // ВАЖНО: месяц считается с 0! Январь = 0, Апрель = 3
+ const START_DATE = new Date(2026, 3, 20, 6, 0, 0);
+
+  // Ваши имена
+  document.getElementById('names').textContent = 'Никита ❤️ Эльвира';
+
+  // Фразы внизу (меняются каждые 10 секунд)
+  const phrases = [
+    'Каждая секунда с тобой — бесценна',
+    'Ты моё самое любимое времяпрепровождение',
+    'С тобой даже секунды летят незаметно',
+    'Я люблю тебя больше с каждым днём',
+    'Эльвира, ты — моё всё ❤️'
+  ];
+
+  /* ====== ЛОГИКА ====== */
+
+  function updateCounter() {
+    const now = new Date();
+    const diff = now - START_DATE;
+
+    if (diff < 0) {
+      document.getElementById('footerText').textContent = 'Ещё чуть-чуть до нашей даты... ❤️';
+      document.getElementById('days').textContent = '0';
+      document.getElementById('hours').textContent = '00';
+      document.getElementById('minutes').textContent = '00';
+      document.getElementById('seconds').textContent = '00';
+      return;
+    }
+
+    const totalSeconds = Math.floor(diff / 1000);
+    const days    = Math.floor(totalSeconds / 86400);
+    const hours   = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    document.getElementById('days').textContent    = days.toLocaleString('ru-RU');
+    document.getElementById('hours').textContent   = String(hours).padStart(2, '0');
+    document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+    document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+  }
+
+  updateCounter();
+  setInterval(updateCounter, 1000);
+
+  // Меняем фразу раз в 10 секунд
+  let phraseIndex = 0;
+  setInterval(() => {
+    phraseIndex = (phraseIndex + 1) % phrases.length;
+    document.getElementById('footerText').textContent = phrases[phraseIndex];
+  }, 10000);
+
+  // Плавающие сердечки
+  const heartsContainer = document.getElementById('hearts');
+  const heartEmojis = ['❤️', '💕', '💗', '💖', '💘', '💝'];
+
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.fontSize = (12 + Math.random() * 20) + 'px';
+    heart.style.animationDuration = (6 + Math.random() * 8) + 's';
+    heart.style.animationDelay = Math.random() * 2 + 's';
+    heartsContainer.appendChild(heart);
+
+    setTimeout(() => heart.remove(), 16000);
+  }
+
+  setInterval(createHeart, 700);
+  for (let i = 0; i < 8; i++) setTimeout(createHeart, i * 300);
+</script>
+
+</body>
+</html>
